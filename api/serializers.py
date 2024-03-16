@@ -10,25 +10,30 @@ class DeviceSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    device = DeviceSerializer(many=True)
-
     class Meta:
         model = Employee
         fields = "__all__"
 
-    def create(self, validated_data):
-        devices = validated_data.pop("device")
-        model_instance = Employee.objects.create(**validated_data)
-
-        for device in devices:
-            Device.objects.create(model_instance, **device)
-        return model_instance
-
 
 class CompanySerializer(serializers.ModelSerializer):
+    employees = serializers.SerializerMethodField()
+
     class Meta:
         model = Company
         fields = "__all__"
+
+    @staticmethod
+    def get_employees(obj):
+        employees = Employee.objects.filter(company=obj)
+        return EmployeeSerializer(employees, many=True).data
+
+    def create(self, validated_data):
+        employees = validated_data.pop("employee")
+        model_instance = Company.objects.create(**validated_data)
+
+        for employee in employees:
+            Employee.objects.create(model_instance, **employee)
+        return model_instance
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
