@@ -18,6 +18,7 @@ class CompanyViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+
 class EmployeeViewSet(ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
